@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <title>military platformer game thing</title>
+    <style>
+        .contents {
+            text-align: center;
+        }
+
+        #canvas {
+            border: 1px solid #000000;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body onload="startGame()">
+    <div class="contents">
+        <canvas id="canvas" width="480" height="300"></canvas>
+        <p id="status-text">War</p>
+        <hr>
+        <div class="button-group">
+            <button onclick="addSoldier('aold', 'a');">Add soldier to team A</button>
+            <button onclick="addSoldier('bold', 'b')">Add soldier to team B</button>
+        </div>
+
+        <!-- <button onclick="alert('i didnt add the war functionality yet so please imagine they fight each other')">Start battle</button> -->
+        <!-- todo: add group tables to add/remove soldiers and customization-->
+        <button onclick="startWar()">Start battle</button>
+        <script src="game.js"></script>
+
+    </div>
+
+</body>
+
+</html>
