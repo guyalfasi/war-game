@@ -10,3 +10,12 @@
 .button-group {
     margin: 10px 0;
 }
+
+.team-forms {
+    display: flex;
+    justify-content: center;
+}
+
+.team-forms form {
+    margin: 0 20px;
+}

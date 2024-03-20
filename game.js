@@ -1,8 +1,8 @@
 const gameArea = {
     canvas: document.getElementById("canvas"),
     statusText: document.getElementById("status-text"),
-    teamA: [],
-    teamB: [],
+    teamA: {teamName: 'A', troops: []},
+    teamB: {teamName: 'B', troops: []},
     verticalPosA: 50,
     verticalPosB: 50,
     start: () => {
@@ -23,27 +23,30 @@ const gameArea = {
 
 const updateGameArea = () => {
     gameArea.clear();
-    gameArea.teamA.forEach(soldier => gameArea.drawSoldier(soldier))
-    gameArea.teamB.forEach(soldier => gameArea.drawSoldier(soldier))
+    gameArea.teamA.troops.forEach(soldier => gameArea.drawSoldier(soldier))
+    gameArea.teamB.troops.forEach(soldier => gameArea.drawSoldier(soldier))
 };
 
-const clearTeams = () => {
-    gameArea.teamA = gameArea.teamB = [];
+const resetTeams = () => {
+    gameArea.teamA.troops = [];
+    gameArea.teamB.troops = [];
     gameArea.verticalPosA = gameArea.verticalPosB = 50;
+    gameArea.teamA.teamName = 'A'
+    gameArea.teamB.teamName = 'B'
 }
 
 const addSoldier = (name, team) => { // todo: add customization
-    if((team === 'a' && gameArea.teamA.length >= 5) || (team === 'b' && gameArea.teamB.length >= 5)) {
+    if((team === 'a' && gameArea.teamA.troops.length >= 5) || (team === 'b' && gameArea.teamB.troops.length >= 5)) {
         alert(`Max number of team members on team ${team} reached`);
         return;
     };
     switch (team) {
         case 'a':
-            gameArea.teamA.push({name: name, color: 'blue', x: 40, y: gameArea.verticalPosA});
+            gameArea.teamA.troops.push({name: name, color: 'blue', x: 40, y: gameArea.verticalPosA});
             gameArea.verticalPosA += 50;
             break;
         case 'b':
-            gameArea.teamB.push({name: name, color: 'red', x: 440, y: gameArea.verticalPosB});
+            gameArea.teamB.troops.push({name: name, color: 'red', x: 440, y: gameArea.verticalPosB});
             gameArea.verticalPosB += 50;
             break;
     }
@@ -52,24 +55,26 @@ const addSoldier = (name, team) => { // todo: add customization
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const startWar = async () => {
-    if(!gameArea.teamA.length && !gameArea.teamB.length) {
+    if(!gameArea.teamA.troops.length && !gameArea.teamB.troops.length) {
         alert('Unable to start war; both teams are empty');
         return;
     }
-    if(!gameArea.teamA.length || !gameArea.teamB.length) {
+    if(!gameArea.teamA.troops.length || !gameArea.teamB.troops.length) {
         alert('Unable to start war; one team is empty');
         return;
     }
-    const savedTeams = { teamA: gameArea.teamA, teamB: gameArea.teamB }
+    const savedTeams = { teamA: gameArea.teamA.troops, teamB: gameArea.teamB.troops }
     $(() => {
         $(".button-group button").prop('disabled', true);
     })
+    gameArea.statusText.innerHTML = `Team ${gameArea.teamA.teamName} vs Team ${gameArea.teamB.teamName}`;
+    await delay(2000);
     let teamWinner = await warLoop();
-    gameArea.statusText.innerHTML = `${teamWinner} won`;
+    gameArea.statusText.innerHTML = `Team ${teamWinner} won`;
     await delay(3000);
-    gameArea.teamA = savedTeams.teamA;
-    gameArea.teamB = savedTeams.teamB;
-    gameArea.statusText.innerHTML = `War`;
+    gameArea.teamA.troops = savedTeams.teamA;
+    gameArea.teamB.troops = savedTeams.teamB;
+    gameArea.statusText.innerHTML = ``;
     $(() => {
         $(".button-group button").prop('disabled', false);
     })
@@ -79,28 +84,38 @@ const fight = (soldier1, soldier2) => Math.random() > 0.5 ? soldier1 : soldier2;
 
 const warLoop = async () => {
     do {
-        let fighterA = gameArea.teamA[Math.floor(Math.random() * gameArea.teamA.length)];
-        let fighterB = gameArea.teamB[Math.floor(Math.random() * gameArea.teamB.length)];
+        let fighterA = gameArea.teamA.troops[Math.floor(Math.random() * gameArea.teamA.troops.length)];
+        let fighterB = gameArea.teamB.troops[Math.floor(Math.random() * gameArea.teamB.troops.length)];
         if(!fighterA || !fighterB) break;
         gameArea.statusText.innerHTML = `${fighterA.name} vs ${fighterB.name}`;
         await delay(1000);
         let winner = fight(fighterA, fighterB);
         switch (winner) {
             case fighterA:
-                gameArea.teamB = gameArea.teamB.filter(soldier => soldier !== fighterB);
+                gameArea.teamB.troops = gameArea.teamB.troops.filter(soldier => soldier !== fighterB);
                 break;
             case fighterB:
-                gameArea.teamA = gameArea.teamA.filter(soldier => soldier !== fighterA);
+                gameArea.teamA.troops = gameArea.teamA.troops.filter(soldier => soldier !== fighterA);
                 break;
             default:
                 break;
         }
         gameArea.statusText.innerHTML = `${winner.name} won`;
         await delay(1000);
-    } while (gameArea.teamA.length && gameArea.teamB.length);
+    } while (gameArea.teamA.troops.length && gameArea.teamB.troops.length);
 
-    return gameArea.teamA.length ? 'Team A' : 'Team B';
+    return gameArea.teamA.troops.length ? gameArea.teamA.teamName : gameArea.teamB.teamName;
 }
 
+const handleTeamFormSubmit = (teamId, teamNameProperty) => {
+    const teamInput = document.getElementById(teamId + "-name");
+    if (teamInput.value === '') {
+        alert('This field cannot be empty.');
+        return;
+    }
+    gameArea[teamNameProperty].teamName = teamInput.value;
+    alert(`${teamId === 'team-a' ? 'Team A' : 'Team B'}'s name set to ${teamInput.value}`)
+    teamInput.value = ''
+}
 
 const startGame = () => gameArea.start();
