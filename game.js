@@ -27,6 +27,11 @@ const updateGameArea = () => {
     gameArea.teamB.forEach(soldier => gameArea.drawSoldier(soldier))
 };
 
+const clearTeams = () => {
+    gameArea.teamA = gameArea.teamB = [];
+    gameArea.verticalPosA = gameArea.verticalPosB = 50;
+}
+
 const addSoldier = (name, team) => { // todo: add customization
     if((team === 'a' && gameArea.teamA.length >= 5) || (team === 'b' && gameArea.teamB.length >= 5)) {
         alert(`Max number of team members on team ${team} reached`);
@@ -44,42 +49,58 @@ const addSoldier = (name, team) => { // todo: add customization
     }
 };
 
-const startWar = () => {
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+const startWar = async () => {
     if(!gameArea.teamA.length && !gameArea.teamB.length) {
-        alert('Unable to start war; both teams are empty')
+        alert('Unable to start war; both teams are empty');
         return;
     }
     if(!gameArea.teamA.length || !gameArea.teamB.length) {
-        alert('Unable to start war; one team is empty')
+        alert('Unable to start war; one team is empty');
         return;
     }
-    // gameArea.statusText.innerHTML = 'starting war'
-    // todo: cache teams when added customization
-    const teamWinner = warLoop()
-    gameArea.statusText.innerHTML = `${teamWinner} won`
+    const savedTeams = { teamA: gameArea.teamA, teamB: gameArea.teamB }
+    $(() => {
+        $(".button-group button").prop('disabled', true);
+    })
+    let teamWinner = await warLoop();
+    gameArea.statusText.innerHTML = `${teamWinner} won`;
+    await delay(3000);
+    gameArea.teamA = savedTeams.teamA;
+    gameArea.teamB = savedTeams.teamB;
+    gameArea.statusText.innerHTML = `War`;
+    $(() => {
+        $(".button-group button").prop('disabled', false);
+    })
 }
 
-const fight = (soldier1, soldier2) => Math.random() > 0.5 ? soldier1 : soldier2 
+const fight = (soldier1, soldier2) => Math.random() > 0.5 ? soldier1 : soldier2;
 
-const warLoop = () => {
+const warLoop = async () => {
     do {
-        let fighterA = gameArea.teamA[Math.floor(Math.random() * gameArea.teamA.length)]
-        let fighterB = gameArea.teamB[Math.floor(Math.random() * gameArea.teamB.length)]
+        let fighterA = gameArea.teamA[Math.floor(Math.random() * gameArea.teamA.length)];
+        let fighterB = gameArea.teamB[Math.floor(Math.random() * gameArea.teamB.length)];
         if(!fighterA || !fighterB) break;
-        console.log(`${fighterA.name} vs ${fighterB.name}`);
+        gameArea.statusText.innerHTML = `${fighterA.name} vs ${fighterB.name}`;
+        await delay(1000);
         let winner = fight(fighterA, fighterB);
         switch (winner) {
             case fighterA:
-                gameArea.teamB = gameArea.teamB.filter(soldier => soldier !== fighterB)
+                gameArea.teamB = gameArea.teamB.filter(soldier => soldier !== fighterB);
                 break;
             case fighterB:
-                gameArea.teamA = gameArea.teamA.filter(soldier => soldier !== fighterA)
+                gameArea.teamA = gameArea.teamA.filter(soldier => soldier !== fighterA);
                 break;
             default:
                 break;
         }
-    } while (gameArea.teamA.length || gameArea.teamB.length);
-    return gameArea.teamA.length ? 'Team A' : 'Team B'
+        gameArea.statusText.innerHTML = `${winner.name} won`;
+        await delay(1000);
+    } while (gameArea.teamA.length && gameArea.teamB.length);
+
+    return gameArea.teamA.length ? 'Team A' : 'Team B';
 }
+
 
 const startGame = () => gameArea.start();
