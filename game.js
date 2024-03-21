@@ -21,6 +21,25 @@ const gameArea = {
     }
 };
 
+const moveTo = (soldier, targetX, targetY, speed) => new Promise(resolve => {
+    const animateMove = () => {
+        let dx = targetX - soldier.x;
+        let dy = targetY - soldier.y;
+        let distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+        if (distance > speed) {
+            soldier.x += dx / distance * speed;
+            soldier.y += dy / distance * speed;
+            requestAnimationFrame(animateMove); 
+        } else {
+            soldier.x = targetX;
+            soldier.y = targetY;
+            resolve();
+        }
+    };
+    animateMove();
+});
+
 const updateGameArea = () => {
     gameArea.clear();
     gameArea.teamA.troops.forEach(soldier => gameArea.drawSoldier(soldier))
@@ -63,7 +82,10 @@ const startWar = async () => {
         alert('Unable to start war; one team is empty');
         return;
     }
-    const savedTeams = { teamA: gameArea.teamA.troops, teamB: gameArea.teamB.troops }
+    const savedTeams = {
+        teamA: JSON.parse(JSON.stringify(gameArea.teamA.troops)),
+        teamB: JSON.parse(JSON.stringify(gameArea.teamB.troops))
+    };
     $(() => {
         $(".button-group button").prop('disabled', true);
     })
@@ -87,15 +109,23 @@ const warLoop = async () => {
         let fighterA = gameArea.teamA.troops[Math.floor(Math.random() * gameArea.teamA.troops.length)];
         let fighterB = gameArea.teamB.troops[Math.floor(Math.random() * gameArea.teamB.troops.length)];
         if(!fighterA || !fighterB) break;
+        fighterAPos = [fighterA.x, fighterA.y]
+        fighterBPos = [fighterB.x, fighterB.y]
+        await moveTo(fighterA, 200, 150, 2);
+        await moveTo(fighterB, 280, 150, 2);
         gameArea.statusText.innerHTML = `${fighterA.name} vs ${fighterB.name}`;
         await delay(1000);
         let winner = fight(fighterA, fighterB);
         switch (winner) {
             case fighterA:
                 gameArea.teamB.troops = gameArea.teamB.troops.filter(soldier => soldier !== fighterB);
+                await delay(1000);
+                await moveTo(fighterA, fighterAPos[0], fighterAPos[1], 2)
                 break;
             case fighterB:
                 gameArea.teamA.troops = gameArea.teamA.troops.filter(soldier => soldier !== fighterA);
+                await delay(1000);
+                await moveTo(fighterB, fighterBPos[0], fighterBPos[1], 2)
                 break;
             default:
                 break;
@@ -103,7 +133,6 @@ const warLoop = async () => {
         gameArea.statusText.innerHTML = `${winner.name} won`;
         await delay(1000);
     } while (gameArea.teamA.troops.length && gameArea.teamB.troops.length);
-
     return gameArea.teamA.troops.length ? gameArea.teamA.teamName : gameArea.teamB.teamName;
 }
 
