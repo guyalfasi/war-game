@@ -3,6 +3,7 @@ const gameArea = {
     statusText: document.getElementById("status-text"),
     teamA: {teamName: 'A', troops: []},
     teamB: {teamName: 'B', troops: []},
+    explosions: [],
     verticalPosA: 50,
     verticalPosB: 50,
     start: () => {
@@ -18,33 +19,29 @@ const gameArea = {
         context.arc(soldier.x, soldier.y, 20, 0, 2 * Math.PI);
         context.fillStyle = soldier.color;
         context.fill();
-    }
+    },
+    drawExplosion: (explosion) => {
+        const context = this.context;
+        context.beginPath();
+        context.arc(explosion.x, explosion.y, explosion.radius, 0, 2 * Math.PI);
+        context.fillStyle = 'red';
+        context.fill();
+    },    
 };
-
-const moveTo = (soldier, targetX, targetY, speed) => new Promise(resolve => {
-    const animateMove = () => {
-        let dx = targetX - soldier.x;
-        let dy = targetY - soldier.y;
-        let distance = Math.sqrt(dx ** 2 + dy ** 2);
-
-        if (distance > speed) {
-            soldier.x += dx / distance * speed;
-            soldier.y += dy / distance * speed;
-            requestAnimationFrame(animateMove); 
-        } else {
-            soldier.x = targetX;
-            soldier.y = targetY;
-            resolve();
-        }
-    };
-    animateMove();
-});
 
 const updateGameArea = () => {
     gameArea.clear();
-    gameArea.teamA.troops.forEach(soldier => gameArea.drawSoldier(soldier))
-    gameArea.teamB.troops.forEach(soldier => gameArea.drawSoldier(soldier))
+    gameArea.teamA.troops.forEach(soldier => gameArea.drawSoldier(soldier));
+    gameArea.teamB.troops.forEach(soldier => gameArea.drawSoldier(soldier));
+    gameArea.explosions.forEach(explosion => {
+        gameArea.drawExplosion(explosion);
+        explosion.radius += 2; 
+        if (explosion.radius > 30) {
+            gameArea.explosions = gameArea.explosions.filter(e => e !== explosion);
+        }
+    });
 };
+
 
 const resetTeams = () => {
     gameArea.teamA.troops = [];
@@ -70,6 +67,25 @@ const addSoldier = (name, team) => { // todo: add customization
             break;
     }
 };
+
+const moveTo = (soldier, targetX, targetY, speed) => new Promise(resolve => {
+    const animateMove = () => {
+        let dx = targetX - soldier.x;
+        let dy = targetY - soldier.y;
+        let distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+        if (distance > speed) {
+            soldier.x += dx / distance * speed;
+            soldier.y += dy / distance * speed;
+            requestAnimationFrame(animateMove); 
+        } else {
+            soldier.x = targetX;
+            soldier.y = targetY;
+            resolve();
+        }
+    };
+    animateMove();
+});
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -116,13 +132,24 @@ const warLoop = async () => {
         gameArea.statusText.innerHTML = `${fighterA.name} vs ${fighterB.name}`;
         await delay(1000);
         let winner = fight(fighterA, fighterB);
+        gameArea.statusText.innerHTML = `${winner.name} won`;
         switch (winner) {
             case fighterA:
+                gameArea.explosions.push({
+                    x: fighterB.x,
+                    y: fighterB.y,
+                    radius: 5
+                });
                 gameArea.teamB.troops = gameArea.teamB.troops.filter(soldier => soldier !== fighterB);
                 await delay(1000);
                 await moveTo(fighterA, fighterAPos[0], fighterAPos[1], 2)
                 break;
             case fighterB:
+                gameArea.explosions.push({
+                    x: fighterA.x,
+                    y: fighterA.y,
+                    radius: 5
+                });
                 gameArea.teamA.troops = gameArea.teamA.troops.filter(soldier => soldier !== fighterA);
                 await delay(1000);
                 await moveTo(fighterB, fighterBPos[0], fighterBPos[1], 2)
@@ -130,8 +157,6 @@ const warLoop = async () => {
             default:
                 break;
         }
-        gameArea.statusText.innerHTML = `${winner.name} won`;
-        await delay(1000);
     } while (gameArea.teamA.troops.length && gameArea.teamB.troops.length);
     return gameArea.teamA.troops.length ? gameArea.teamA.teamName : gameArea.teamB.teamName;
 }
