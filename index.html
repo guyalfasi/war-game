@@ -16,6 +16,7 @@
         </canvas>
         <p id="status-text"></p>
         <hr>
+        <p id="gambling-status">Auto mode: ON</p>
         <div class="button-group">
             <script src="src/battle.js" type="module"></script>
             <button id="add-group-a-button" onclick="addSoldier('aold', 'a')">Add soldier to team A</button>
@@ -23,10 +24,12 @@
             <br />
             <button id="start-war-button" onclick="startWar()">Start battle</button>
             <button id="clear-button" onclick="resetTeams()">Reset</button>
+            <br />
+            <button id="activate-auto-mode" onclick="handleAutoToggle()">Toggle auto</button>
         </div>
         <!-- todo: add group tables to add/remove soldiers and customization-->
         <div class="team-forms">
-            <script src="src/teamform.js"> </script>
+            
             <form id="team-a-form">
                 <label for="fname">Set Team A name:</label><br>
                 <input type="text" id="team-a-name" name="team-a-name">
@@ -37,7 +40,9 @@
                 <input type="text" id="team-b-name" name="team-b-name">
                 <input type="submit" value="Submit">
             </form>
+            <script src="src/teamform.js"> </script>
         </div>
+        
     </div>
 </body>
 </html>

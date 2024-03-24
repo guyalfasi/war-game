@@ -5,6 +5,7 @@ const gameArea = {
     explosions: [],
     verticalPosA: 50,
     verticalPosB: 50,
+    isAuto: true,
     start: () => {
         this.context = this.canvas.getContext("2d");
         this.interval = setInterval(updateGameArea, 20);
@@ -66,6 +67,9 @@ const addSoldier = (name, team) => { // todo: add customization
     }
 };
 
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const handleAutoToggle = () => {
+    gameArea.isAuto = !gameArea.isAuto
+    gameArea.isAuto ? $('#gambling-status').html('Auto mode: ON') : $('#gambling-status').html('Auto mode: OFF')
+}
 
 const startGame = () => gameArea.start();
