@@ -138,7 +138,7 @@ const warLoop = async () => {
                 gameArea.explosions.push({
                     x: fighterB.x,
                     y: fighterB.y,
-                    radius: 5
+                    radius: 8
                 });
                 gameArea.teamB.troops = gameArea.teamB.troops.filter(soldier => soldier !== fighterB);
                 await delay(1000);
@@ -148,7 +148,7 @@ const warLoop = async () => {
                 gameArea.explosions.push({
                     x: fighterA.x,
                     y: fighterA.y,
-                    radius: 5
+                    radius: 8
                 });
                 gameArea.teamA.troops = gameArea.teamA.troops.filter(soldier => soldier !== fighterA);
                 await delay(1000);
