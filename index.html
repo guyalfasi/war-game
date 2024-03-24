@@ -3,18 +3,22 @@
 
 <head>
     <title>War Game</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body onload="startGame()">
     <div class="contents">
         <h1>War Game</h1>
-        <canvas id="canvas" width="480" height="300"></canvas>
+        <canvas id="canvas" width="480" height="300">
+            <script src="src/game.js"></script>
+            <script src="src/battle.js"></script>
+        </canvas>
         <p id="status-text"></p>
         <hr>
         <div class="button-group">
-            <button id="add-group-a-button" onclick="addSoldier('aold', 'a');">Add soldier to team A</button>
+            <script src="src/battle.js" type="module"></script>
+            <button id="add-group-a-button" onclick="addSoldier('aold', 'a')">Add soldier to team A</button>
             <button id="add-group-b-button" onclick="addSoldier('bold', 'b')">Add soldier to team B</button>
             <br />
             <button id="start-war-button" onclick="startWar()">Start battle</button>
@@ -22,6 +26,7 @@
         </div>
         <!-- todo: add group tables to add/remove soldiers and customization-->
         <div class="team-forms">
+            <script src="src/teamform.js"> </script>
             <form id="team-a-form">
                 <label for="fname">Set Team A name:</label><br>
                 <input type="text" id="team-a-name" name="team-a-name">
@@ -32,18 +37,7 @@
                 <input type="text" id="team-b-name" name="team-b-name">
                 <input type="submit" value="Submit">
             </form>
-            <script>
-                document.getElementById("team-a-form").addEventListener("submit", (event) => {
-                    event.preventDefault();
-                    handleTeamFormSubmit("team-a", "teamA");
-                });
-                document.getElementById("team-b-form").addEventListener("submit", (event) => {
-                    event.preventDefault();
-                    handleTeamFormSubmit("team-b", "teamB");
-                });
-            </script>
         </div>
-        <script src="game.js"></script>
     </div>
 </body>
 </html>
