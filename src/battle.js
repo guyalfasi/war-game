@@ -75,21 +75,43 @@ const warLoop = async () => {
         while (!winner) {
             if (gameArea.isAuto) {
                 winner = fight(fighterA, fighterB);
-                $("#status-text").html(`${winner.name} won`)
+                $("#status-text").html(`${winner.name} won`);
             } else {
+                let earlyPressDetected = false;
                 $("#status-text").html(`Wait... Team ${gameArea.teamA.teamName}: Press A, Team ${gameArea.teamB.teamName}: Press L`);
-                await delay(Math.floor(Math.random() * 15 * 1000 + 5)); 
+                
+                const handleEarlyPress = async (event) => {
+                    if (['A', 'L'].includes(event.key.toUpperCase())) {
+                        earlyPressDetected = true;
+                        $("#status-text").html(`Pressed too early, restarting duel`);
+                        await delay(2000);
+                        document.removeEventListener('keydown', handleEarlyPress);
+                    }
+                }
+                
+                document.addEventListener("keydown", handleEarlyPress);
+                
+                await delay(Math.floor(Math.random() * 15 * 1000 + 5)); // fix: early press handler takes longer than excepted to respond due to this
+
+                if (earlyPressDetected) {
+                    continue;
+                }
+
+                document.removeEventListener('keydown', handleEarlyPress);
+                
                 $("#status-text").html("Draw!");
                 winner = await handleDuel(fighterA, fighterB);
-    
+
                 if (!winner) {
-                    $("#status-text").html("Tie, no one pressed button. Restarting duel");
+                    $("#status-text").html("Tie, no one pressed the button. Restarting duel");
                     await delay(2000);
-                    continue; 
+                    continue;
                 }
+
                 $("#status-text").html(`${winner.name} won`);
             }
         }
+
 
         switch (winner) {
             case fighterA:
