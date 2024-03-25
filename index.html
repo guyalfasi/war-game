@@ -19,17 +19,19 @@
         <p id="gambling-status">Auto mode: OFF</p>
         <div class="button-group">
             <script src="src/battle.js" type="module"></script>
-            <button id="add-group-a-button" onclick="addSoldier('aold', 'a')">Add soldier to team A</button>
-            <button id="add-group-b-button" onclick="addSoldier('bold', 'b')">Add soldier to team B</button>
+            <button id="add-group-a-button" onclick="addSoldier('a')">Add soldier to team A</button>
+            <button id="add-group-b-button" onclick="addSoldier('b')">Add soldier to team B</button>
             <br />
             <button id="start-war-button" onclick="startWar()">Start battle</button>
             <button id="clear-button" onclick="resetTeams()">Reset</button>
             <br />
             <button id="activate-auto-mode" onclick="handleAutoToggle()">Toggle auto</button>
+            <br />
+            <button id="remove-soldier-a" onclick="removeSoldier('a')">Remove soldier from team A</button>
+            <button id="remove-soldier-b" onclick="removeSoldier('b')">Remove soldier from team B</button>
         </div>
         <!-- todo: add group tables to add/remove soldiers and customization-->
         <div class="team-forms">
-            
             <form id="team-a-form">
                 <label for="fname">Set Team A name:</label><br>
                 <input type="text" id="team-a-name" name="team-a-name">
@@ -43,6 +45,9 @@
             <script src="src/teamform.js"> </script>
         </div>
         
+        <input id="img-input-team-a" type="file" accept="image/*" onchange="setTeamImage(event, 'a')">
+        <input id="img-input-team-b" type="file" accept="image/*" onchange="setTeamImage(event, 'b')">
+
     </div>
 </body>
 </html>

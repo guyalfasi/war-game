@@ -1,7 +1,7 @@
 const gameArea = {
     canvas: document.getElementById("canvas"),
-    teamA: {teamName: 'A', troops: []},
-    teamB: {teamName: 'B', troops: []},
+    teamA: { teamName: 'A', troops: [], teamImg: '' },
+    teamB: { teamName: 'B', troops: [], teamImg: '' },
     explosions: [],
     verticalPosA: 50,
     verticalPosB: 50,
@@ -15,10 +15,18 @@ const gameArea = {
     },
     drawSoldier: (soldier) => {
         const context = this.context;
-        context.beginPath();
-        context.arc(soldier.x, soldier.y, 20, 0, 2 * Math.PI);
-        context.fillStyle = soldier.color;
-        context.fill();
+        if (soldier.troopImg) {
+            let img = new Image();
+            img.onload = () => {
+                context.drawImage(img, soldier.x, soldier.y, 40, 40);
+            };
+            img.src = soldier.troopImg;
+        } else {
+            context.beginPath();
+            context.arc(soldier.x, soldier.y, 20, 0, 2 * Math.PI);
+            context.fillStyle = soldier.color;
+            context.fill();
+        }
     },
     drawExplosion: (explosion) => {
         const context = this.context;
@@ -35,7 +43,7 @@ const updateGameArea = () => {
     gameArea.teamB.troops.forEach(soldier => gameArea.drawSoldier(soldier));
     gameArea.explosions.forEach(explosion => {
         gameArea.drawExplosion(explosion);
-        explosion.radius += 2; 
+        explosion.radius += 2;
         if (explosion.radius > 30) {
             gameArea.explosions = gameArea.explosions.filter(e => e !== explosion);
         }
@@ -50,22 +58,41 @@ const resetTeams = () => {
     gameArea.teamB.teamName = 'B'
 }
 
-const addSoldier = (name, team) => { // todo: add customization
-    if((team === 'a' && gameArea.teamA.troops.length >= 5) || (team === 'b' && gameArea.teamB.troops.length >= 5)) {
+const addSoldier = (team) => { // todo: add customization
+    if ((team === 'a' && gameArea.teamA.troops.length >= 5) || (team === 'b' && gameArea.teamB.troops.length >= 5)) {
         alert(`Max number of team members on team ${team} reached`);
         return;
     };
     switch (team) {
         case 'a':
-            gameArea.teamA.troops.push({name: name, color: 'blue', x: 40, y: gameArea.verticalPosA});
+            gameArea.teamA.troops.push({ name: `${gameArea.teamA.teamName}${gameArea.teamA.troops.length + 1}`, color: 'blue', x: 40, y: gameArea.verticalPosA, troopImg: gameArea.teamA.teamImg });
             gameArea.verticalPosA += 50;
             break;
         case 'b':
-            gameArea.teamB.troops.push({name: name, color: 'red', x: 440, y: gameArea.verticalPosB});
+            gameArea.teamB.troops.push({ name: `${gameArea.teamB.teamName}${gameArea.teamB.troops.length + 1}`, color: 'red', x: 440, y: gameArea.verticalPosB, troopImg: gameArea.teamB.teamImg });
             gameArea.verticalPosB += 50;
             break;
     }
 };
+
+const removeSoldier = (team) => {
+    if ((team === 'a' && !gameArea.teamA.troops.length) || (team === 'b' && !gameArea.teamB.troops.length)) {
+        alert(`Cannot remove from team ${team}, it has no soldiers`);
+        return;
+    }
+    switch (team) {
+        case 'a':
+            gameArea.teamA.troops.pop()
+            gameArea.verticalPosA -= 50;
+            break;
+        case 'b':
+            gameArea.teamB.troops.pop()
+            gameArea.verticalPosB -= 50;
+            break;
+        default:
+            break;
+    }
+}
 
 const handleAutoToggle = () => {
     gameArea.isAuto = !gameArea.isAuto
