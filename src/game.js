@@ -5,7 +5,7 @@ const gameArea = {
     explosions: [],
     verticalPosA: 50,
     verticalPosB: 50,
-    isAuto: true,
+    isAuto: false,
     start: () => {
         this.context = this.canvas.getContext("2d");
         this.interval = setInterval(updateGameArea, 20);
