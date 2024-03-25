@@ -55,7 +55,6 @@ const handleDuel = (fighterA, fighterB) => new Promise(resolve => {
     }, 2000); 
 });
 
-
 const warLoop = async () => {
     do {
         let fighterA = gameArea.teamA.troops[Math.floor(Math.random() * gameArea.teamA.troops.length)];
@@ -72,24 +71,24 @@ const warLoop = async () => {
         $("#status-text").html(`${fighterA.name} vs ${fighterB.name}`)
         let winner;
         await delay(1000);
-        
-        if (gameArea.isAuto) {
-            winner = fight(fighterA, fighterB);
-            $("#status-text").html(`${winner.name} won`)
-        } else {
-            $("#status-text").html(`Wait... Team ${gameArea.teamA.teamName}: Press A, Team ${gameArea.teamB.teamName}: Press L`);
-            await delay(Math.floor(Math.random() * 15 * 1000 + 5)); 
-            $("#status-text").html("Draw!");
-            winner = await handleDuel(fighterA, fighterB);
 
-            if (!winner) {
-                // todo: bug fix - on tie, restart fight but not function
-                $("#status-text").html("Tie, no one pressed button. Restarting duel");
-                await delay(2000);
-                continue; 
+        while (!winner) {
+            if (gameArea.isAuto) {
+                winner = fight(fighterA, fighterB);
+                $("#status-text").html(`${winner.name} won`)
+            } else {
+                $("#status-text").html(`Wait... Team ${gameArea.teamA.teamName}: Press A, Team ${gameArea.teamB.teamName}: Press L`);
+                await delay(Math.floor(Math.random() * 15 * 1000 + 5)); 
+                $("#status-text").html("Draw!");
+                winner = await handleDuel(fighterA, fighterB);
+    
+                if (!winner) {
+                    $("#status-text").html("Tie, no one pressed button. Restarting duel");
+                    await delay(2000);
+                    continue; 
+                }
+                $("#status-text").html(`${winner.name} won`);
             }
-
-            $("#status-text").html(`${winner.name} won`);
         }
 
         switch (winner) {
