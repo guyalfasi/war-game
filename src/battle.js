@@ -42,8 +42,6 @@ const handleDuel = (fighterA, fighterB) => new Promise(resolve => {
             case 'L':
                 resolve(fighterB);
                 break;
-            default:
-                break;
         }
         document.removeEventListener('keydown', handleKeyPress);
     };
