@@ -34,16 +34,18 @@ const fight = (soldier1, soldier2) => Math.random() > 0.5 ? soldier1 : soldier2;
 const handleDuel = (fighterA, fighterB) => new Promise(resolve => {
     let inputTimeout;
     const handleKeyPress = (event) => {
-        clearTimeout(inputTimeout);
         switch (event.key.toUpperCase()) {
             case 'A':
+                clearTimeout(inputTimeout);
+                document.removeEventListener('keydown', handleKeyPress);
                 resolve(fighterA);
                 break;
             case 'L':
+                clearTimeout(inputTimeout);
+                document.removeEventListener('keydown', handleKeyPress);
                 resolve(fighterB);
                 break;
         }
-        document.removeEventListener('keydown', handleKeyPress);
     };
     document.addEventListener('keydown', handleKeyPress);
 
@@ -52,6 +54,7 @@ const handleDuel = (fighterA, fighterB) => new Promise(resolve => {
         resolve(null); 
     }, 2000); 
 });
+
 
 const warLoop = async () => {
     do {
