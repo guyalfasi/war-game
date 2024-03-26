@@ -62,8 +62,8 @@ const warLoop = async () => {
 
         if(!fighterA || !fighterB) break;
         
-        fighterAPos = [fighterA.x, fighterA.y]
-        fighterBPos = [fighterB.x, fighterB.y]
+        fighterAPos = {x: fighterA.x, y: fighterA.y}
+        fighterBPos = {x: fighterB.x, y: fighterB.y}
         
         await moveTo(fighterA, 200, 150, 2);
         await moveTo(fighterB, 280, 150, 2);
@@ -91,7 +91,7 @@ const warLoop = async () => {
                 
                 document.addEventListener("keydown", handleEarlyPress);
                 
-                await delay(Math.floor(Math.random() * 15 * 1000 + 5)); // fix: early press handler takes longer than excepted to respond due to this
+                await delay(Math.floor((Math.random() * 10 * 1000) + 3)); // fix: early press handler takes longer than excepted to respond due to this
 
                 if (earlyPressDetected) {
                     continue;
@@ -111,7 +111,6 @@ const warLoop = async () => {
             }
         }
 
-
         switch (winner) {
             case fighterA:
                 gameArea.deathEffects.push({
@@ -121,7 +120,7 @@ const warLoop = async () => {
                 });
                 gameArea.teamB.troops = gameArea.teamB.troops.filter(soldier => soldier !== fighterB);
                 await delay(1000);
-                await moveTo(fighterA, fighterAPos[0], fighterAPos[1], 2)
+                await moveTo(fighterA, fighterAPos.x, fighterAPos.y, 2)
                 break;
             case fighterB:
                 gameArea.deathEffects.push({
@@ -131,7 +130,7 @@ const warLoop = async () => {
                 });
                 gameArea.teamA.troops = gameArea.teamA.troops.filter(soldier => soldier !== fighterA);
                 await delay(1000);
-                await moveTo(fighterB, fighterBPos[0], fighterBPos[1], 2)
+                await moveTo(fighterB, fighterBPos.x, fighterBPos.y, 2)
                 break;
             default:
                 break;
