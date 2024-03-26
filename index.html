@@ -23,7 +23,7 @@
             <button id="add-group-b-button" onclick="addSoldier('b')">Add soldier to team B</button>
             <br />
             <button id="start-war-button" onclick="startWar()">Start battle</button>
-            <button id="clear-button" onclick="resetTeams()">Reset</button>
+            <button id="clear-button" onclick="resetGame()">Reset</button>
             <br />
             <button id="activate-auto-mode" onclick="handleAutoToggle()">Toggle auto</button>
             <br />
@@ -42,12 +42,17 @@
                 <input type="text" id="team-b-name" name="team-b-name">
                 <input type="submit" value="Submit">
             </form>
-            <script src="src/teamform.js"> </script>
+            <script src="src/menu.js"> </script>
         </div>
-        
-        <input id="img-input-team-a" type="file" accept="image/*" onchange="setTeamImage(event, 'a')">
-        <input id="img-input-team-b" type="file" accept="image/*" onchange="setTeamImage(event, 'b')">
-
+        <div class="image-team-inputs">
+            <input id="img-input-team-a" type="file" accept="image/*" onchange="setTeamImage(event, 'a')">
+            <input id="img-input-team-b" type="file" accept="image/*" onchange="setTeamImage(event, 'b')">
+        </div>
+        <br>
+        <div class="img-reset-buttons">
+            <button id="img-clear-team-a" onclick="clearImage('a')">Reset image team A</button>
+            <button id="img-clear-team-b" onclick="clearImage('b')">Reset image team B</button>
+        </div>
     </div>
 </body>
 </html>

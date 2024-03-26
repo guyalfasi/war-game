@@ -2,7 +2,7 @@ const gameArea = {
     canvas: document.getElementById("canvas"),
     teamA: { teamName: 'A', troops: [], teamImg: '' },
     teamB: { teamName: 'B', troops: [], teamImg: '' },
-    explosions: [],
+    deathEffects: [],
     verticalPosA: 50,
     verticalPosB: 50,
     isAuto: false,
@@ -18,7 +18,7 @@ const gameArea = {
         if (soldier.troopImg) {
             let img = new Image();
             img.onload = () => {
-                context.drawImage(img, soldier.x, soldier.y, 40, 40);
+                context.drawImage(img, soldier.x - 20, soldier.y - 20, 40, 40);
             };
             img.src = soldier.troopImg;
         } else {
@@ -28,10 +28,10 @@ const gameArea = {
             context.fill();
         }
     },
-    drawExplosion: (explosion) => {
+    drawDeath: (deathEffect) => {
         const context = this.context;
         context.beginPath();
-        context.arc(explosion.x, explosion.y, explosion.radius, 0, 2 * Math.PI);
+        context.arc(deathEffect.x, deathEffect.y, deathEffect.radius, 0, 2 * Math.PI);
         context.fillStyle = 'red'; // its blood btw
         context.fill();
     }
@@ -41,22 +41,14 @@ const updateGameArea = () => {
     gameArea.clear();
     gameArea.teamA.troops.forEach(soldier => gameArea.drawSoldier(soldier));
     gameArea.teamB.troops.forEach(soldier => gameArea.drawSoldier(soldier));
-    gameArea.explosions.forEach(explosion => {
-        gameArea.drawExplosion(explosion);
-        explosion.radius += 2;
-        if (explosion.radius > 30) {
-            gameArea.explosions = gameArea.explosions.filter(e => e !== explosion);
+    gameArea.deathEffects.forEach(deathEffect => {
+        gameArea.drawDeath(deathEffect);
+        deathEffect.radius += 2;
+        if (deathEffect.radius > 30) {
+            gameArea.deathEffects = gameArea.deathEffects.filter(e => e !== deathEffect);
         }
     });
 };
-
-const resetTeams = () => {
-    gameArea.teamA.troops = [];
-    gameArea.teamB.troops = [];
-    gameArea.verticalPosA = gameArea.verticalPosB = 50;
-    gameArea.teamA.teamName = 'A'
-    gameArea.teamB.teamName = 'B'
-}
 
 const addSoldier = (team) => { // todo: add customization
     if ((team === 'a' && gameArea.teamA.troops.length >= 5) || (team === 'b' && gameArea.teamB.troops.length >= 5)) {

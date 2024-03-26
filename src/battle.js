@@ -13,7 +13,7 @@ const startWar = async () => {
         teamB: JSON.parse(JSON.stringify(gameArea.teamB.troops))
     };
 
-    $(".button-group button").prop('disabled', true);
+    toggleMenuButtons(true);
     $("#status-text").html(`Team ${gameArea.teamA.teamName} vs Team ${gameArea.teamB.teamName}`)
     await delay(2000);
     
@@ -24,7 +24,7 @@ const startWar = async () => {
     gameArea.teamA.troops = savedTeams.teamA;
     gameArea.teamB.troops = savedTeams.teamB;
     $("#status-text").html("")
-    $(".button-group button").prop('disabled', false);
+    toggleMenuButtons(false);
 }
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
@@ -107,7 +107,6 @@ const warLoop = async () => {
                     await delay(2000);
                     continue;
                 }
-
                 $("#status-text").html(`${winner.name} won`);
             }
         }
@@ -115,7 +114,7 @@ const warLoop = async () => {
 
         switch (winner) {
             case fighterA:
-                gameArea.explosions.push({
+                gameArea.deathEffects.push({
                     x: fighterB.x,
                     y: fighterB.y,
                     radius: 8
@@ -125,7 +124,7 @@ const warLoop = async () => {
                 await moveTo(fighterA, fighterAPos[0], fighterAPos[1], 2)
                 break;
             case fighterB:
-                gameArea.explosions.push({
+                gameArea.deathEffects.push({
                     x: fighterA.x,
                     y: fighterA.y,
                     radius: 8
