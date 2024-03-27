@@ -3,24 +3,37 @@ const gameArea = {
     teamA: { teamName: 'A', troops: [], teamImg: '' },
     teamB: { teamName: 'B', troops: [], teamImg: '' },
     deathEffects: [],
+    imageCache: {},
     verticalPosA: 50,
     verticalPosB: 50,
     isAuto: false,
     start: () => {
-        this.context = this.canvas.getContext("2d");
-        this.interval = setInterval(updateGameArea, 20);
+        gameArea.context = gameArea.canvas.getContext("2d");
+        gameArea.lastFrameTime = Date.now();
+        const animate = () => {
+            const now = Date.now();
+            const elapsed = now - gameArea.lastFrameTime;
+            if (elapsed > 20) { // simulate the interval of 20ms
+                gameArea.lastFrameTime = now - (elapsed % 20);
+                updateGameArea();
+            }
+            requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
     },
     clear: () => {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        gameArea.context.clearRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);
     },
     drawSoldier: (soldier) => {
-        const context = this.context;
+        const context = gameArea.context;
         if (soldier.troopImg) {
-            let img = new Image();
-            img.onload = () => {
+            if (!gameArea.imageCache[soldier.troopImg]) {
+                gameArea.loadImage(soldier.troopImg);
+            }
+            const img = gameArea.imageCache[soldier.troopImg];
+            if (img) {
                 context.drawImage(img, soldier.x - 20, soldier.y - 20, 40, 40);
-            };
-            img.src = soldier.troopImg;
+            }
         } else {
             context.beginPath();
             context.arc(soldier.x, soldier.y, 20, 0, 2 * Math.PI);
@@ -29,11 +42,22 @@ const gameArea = {
         }
     },
     drawDeath: (deathEffect) => {
-        const context = this.context;
+        const context = gameArea.context;
         context.beginPath();
         context.arc(deathEffect.x, deathEffect.y, deathEffect.radius, 0, 2 * Math.PI);
         context.fillStyle = 'red'; // its blood btw
         context.fill();
+    },
+    loadImage: (imageUrl) => {
+        if (gameArea.imageCache[imageUrl]) {
+            return;
+        }
+        
+        let img = new Image();
+        img.onload = () => {
+            gameArea.imageCache[imageUrl] = img;
+        };
+        img.src = imageUrl;
     }
 };
 
@@ -50,7 +74,8 @@ const updateGameArea = () => {
     });
 };
 
-const addSoldier = (team) => { // todo: add customization
+
+const addSoldier = (team) => {
     if ((team === 'a' && gameArea.teamA.troops.length >= 5) || (team === 'b' && gameArea.teamB.troops.length >= 5)) {
         alert(`Max number of team members on team ${team} reached`);
         return;
