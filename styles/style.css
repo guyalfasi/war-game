@@ -4,10 +4,15 @@
 
 #canvas {
     border: 1px solid #000000;
+    border-radius: 5px;
 }
 
-.button-group {
+.menu-button-group {
     margin: 10px 0;
+    button {
+        margin: 1px;
+        width: 4%;
+    }
 }
 
 .team-forms {
@@ -18,3 +23,31 @@
 .team-forms form {
     margin: 0 20px;
 }
+
+.team-sections {
+    text-align: center;
+    button {
+        margin: 2px;
+    }
+    input[type='file'] {
+        display: none;
+    }
+}
+
+.team-a, .team-b {
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    .team-a-customization, .team-b-customization {
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    
+    .team-a-add-remove, .team-b-add-remove {
+        padding-bottom: 5px;
+    }
+}
+
+    
