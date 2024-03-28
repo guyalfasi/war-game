@@ -1,9 +1,9 @@
 const startWar = async () => {
-    if(!gameArea.teamA.troops.length && !gameArea.teamB.troops.length) {
+    if (!gameArea.teamA.troops.length && !gameArea.teamB.troops.length) {
         alert('Unable to start war; both teams are empty');
         return;
     }
-    if(!gameArea.teamA.troops.length || !gameArea.teamB.troops.length) {
+    if (!gameArea.teamA.troops.length || !gameArea.teamB.troops.length) {
         alert('Unable to start war; one team is empty');
         return;
     }
@@ -16,11 +16,11 @@ const startWar = async () => {
     toggleMenuButtons(true);
     $("#status-text").html(`Team ${gameArea.teamA.teamName} vs Team ${gameArea.teamB.teamName}`)
     await delay(2000);
-    
+
     let teamWinner = await warLoop();
     $("#status-text").html(`Team ${teamWinner} won`)
     await delay(3000);
-    
+
     gameArea.teamA.troops = savedTeams.teamA;
     gameArea.teamB.troops = savedTeams.teamB;
     $("#status-text").html("")
@@ -31,29 +31,45 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const fight = (soldier1, soldier2) => Math.random() > 0.5 ? soldier1 : soldier2;
 
-const handleDuel = (fighterA, fighterB) => new Promise(resolve => {
-    let inputTimeout;
+const handleDuel = (fighterA, fighterB, drawTime) => new Promise(resolve => {
+    let validPress = false;
+    const inputTimeout = setTimeout(() => {
+        document.removeEventListener('keydown', handleKeyPress);
+        resolve(null);
+    }, 2000 + drawTime);
+
+    let drawTimeout = setTimeout(() => {
+        validPress = true;
+        $("#status-text").html("Draw!");
+    }, drawTime);
+
     const handleKeyPress = (event) => {
-        switch (event.key.toUpperCase()) {
-            case 'A':
-                clearTimeout(inputTimeout);
-                document.removeEventListener('keydown', handleKeyPress);
-                resolve(fighterA);
-                break;
-            case 'L':
-                clearTimeout(inputTimeout);
-                document.removeEventListener('keydown', handleKeyPress);
-                resolve(fighterB);
-                break;
+        if (!validPress && (event.key.toUpperCase() === 'A' || event.key.toUpperCase() === 'L')) {
+            clearTimeout(inputTimeout);
+            clearTimeout(drawTimeout);
+            document.removeEventListener('keydown', handleKeyPress);
+            resolve("early")
+        }
+
+        if (validPress) {
+            switch (event.key.toUpperCase()) {
+                case 'A':
+                    clearTimeout(inputTimeout);
+                    document.removeEventListener('keydown', handleKeyPress);
+                    resolve(fighterA);
+                    break;
+                case 'L':
+                    clearTimeout(inputTimeout);
+                    document.removeEventListener('keydown', handleKeyPress);
+                    resolve(fighterB);
+                    break;
+            }
         }
     };
-    document.addEventListener('keydown', handleKeyPress);
 
-    inputTimeout = setTimeout(() => {
-        document.removeEventListener('keydown', handleKeyPress);
-        resolve(null); 
-    }, 2000); 
+    document.addEventListener('keydown', handleKeyPress);
 });
+
 
 
 const warLoop = async () => {
@@ -61,14 +77,13 @@ const warLoop = async () => {
         let fighterA = gameArea.teamA.troops[Math.floor(Math.random() * gameArea.teamA.troops.length)];
         let fighterB = gameArea.teamB.troops[Math.floor(Math.random() * gameArea.teamB.troops.length)];
 
-        if(!fighterA || !fighterB) break;
-        
-        fighterAPos = {x: fighterA.x, y: fighterA.y}
-        fighterBPos = {x: fighterB.x, y: fighterB.y}
-        
-        await moveTo(fighterA, 200, 150, 2);
-        await moveTo(fighterB, 280, 150, 2);
-        
+        if (!fighterA || !fighterB) break;
+
+        fighterAPos = { x: fighterA.x, y: fighterA.y }
+        fighterBPos = { x: fighterB.x, y: fighterB.y }
+
+        await Promise.all([moveTo(fighterA, 200, 150, 2), moveTo(fighterB, 280, 150, 2)])
+
         $("#status-text").html(`${fighterA.name} vs ${fighterB.name}`)
         let winner;
         await delay(1000);
@@ -78,33 +93,19 @@ const warLoop = async () => {
                 winner = fight(fighterA, fighterB);
                 $("#status-text").html(`${winner.name} won`);
             } else {
-                let earlyPressDetected = false;
                 $("#status-text").html(`Wait... Team ${gameArea.teamA.teamName}: Press A, Team ${gameArea.teamB.teamName}: Press L`);
-                
-                const handleEarlyPress = async (event) => {
-                    if (['A', 'L'].includes(event.key.toUpperCase())) {
-                        earlyPressDetected = true;
-                        $("#status-text").html(`Pressed too early, restarting duel`);
-                        await delay(2000);
-                        document.removeEventListener('keydown', handleEarlyPress);
-                    }
-                }
-                
-                document.addEventListener("keydown", handleEarlyPress);
-                
-                await delay(Math.floor((Math.random() * 10 * 1000) + 3)); // fix: early press handler takes longer than excepted to respond due to this
 
-                if (earlyPressDetected) {
-                    continue;
-                }
-
-                document.removeEventListener('keydown', handleEarlyPress);
+                let drawTime = Math.floor((Math.random() * 10 * 1000) + 3);
                 
-                $("#status-text").html("Draw!");
-                winner = await handleDuel(fighterA, fighterB);
-
+                winner = await handleDuel(fighterA, fighterB, drawTime);
+                
                 if (!winner) {
                     $("#status-text").html("Tie, no one pressed the button. Restarting duel");
+                    await delay(2000);
+                    continue;
+                } else if (winner === 'early') { // todo: think of a better solution for this 
+                    winner = null;
+                    $("#status-text").html(`Pressed too early, restarting duel`);
                     await delay(2000);
                     continue;
                 }
@@ -149,7 +150,7 @@ const moveTo = (soldier, targetX, targetY, speed) => new Promise(resolve => {
         if (distance > speed) {
             soldier.x += dx / distance * speed;
             soldier.y += dy / distance * speed;
-            requestAnimationFrame(animateMove); 
+            requestAnimationFrame(animateMove);
         } else {
             soldier.x = targetX;
             soldier.y = targetY;
