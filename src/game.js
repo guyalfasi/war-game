@@ -113,7 +113,7 @@ const removeSoldier = (team) => {
 
 const handleAutoToggle = () => {
     gameArea.isAuto = !gameArea.isAuto
-    gameArea.isAuto ? $('#gambling-status').html('Auto mode: ON') : $('#gambling-status').html('Auto mode: OFF')
+    gameArea.isAuto ? $('#auto-status').html('Auto mode: ON') : $('#auto-status').html('Auto mode: OFF')
 }
 
 const startGame = () => gameArea.start();

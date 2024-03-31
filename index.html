@@ -9,11 +9,11 @@
 
 <body onload="startGame()">
     <div class="contents">
-        <h1>War Game</h1>
+        <h1 class="game-header">War Game</h1>
         <canvas id="canvas" width="480" height="300"></canvas>
         <p id="status-text"></p>
         <hr>
-        <p id="gambling-status">Auto mode: OFF</p>
+        <p id="auto-status">Auto mode: OFF</p>
         <div class="menu-button-group">
             <button id="start-war-button" onclick="startWar()">Start battle</button>
             <br />
@@ -30,7 +30,7 @@
                 </div>
                 <div class="team-a-customization">
                     <form id="team-a-form">
-                        <label for="fname">Set Team A name:</label><br>
+                        <label for="fname">Set Team A name:</label>
                         <input type="text" id="team-a-name" name="team-a-name">
                         <input type="submit" value="Submit">
                     </form>
@@ -48,7 +48,7 @@
                 </div>
                 <div class="team-b-customization">
                     <form id="team-b-form">
-                        <label for="fname">Set Team B name:</label><br>
+                        <label for="fname">Set Team B name:</label>
                         <input type="text" id="team-b-name" name="team-b-name">
                         <input type="submit" value="Submit">
                     </form>
