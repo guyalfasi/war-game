@@ -13,6 +13,7 @@
  */
 const gameArea = {
     canvas: document.getElementById("canvas"),
+    context: this.canvas.getContext("2d"),
     teamA: { teamName: 'A', troops: [], teamImg: '' },
     teamB: { teamName: 'B', troops: [], teamImg: '' },
     deathEffects: [],
@@ -20,17 +21,18 @@ const gameArea = {
     verticalPosA: 50,
     verticalPosB: 50,
     isAuto: false,
+    
     /**
      * Initializes the game area and sets up the animation frame loop
      */
-    start: () => {
-        gameArea.context = gameArea.canvas.getContext("2d");
-        gameArea.lastFrameTime = Date.now();
+    start: function() {
+        // this.context = this.canvas.getContext("2d");
+        this.lastFrameTime = Date.now();
         const animate = () => {
             const now = Date.now();
-            const elapsed = now - gameArea.lastFrameTime;
-            if (elapsed > 20) { // simulate the interval of 20ms
-                gameArea.lastFrameTime = now - (elapsed % 20);
+            const elapsed = now - this.lastFrameTime;
+            if (elapsed > 20) { // simulate interval of 20ms
+                this.lastFrameTime = now - (elapsed % 20);
                 updateGameArea();
             }
             requestAnimationFrame(animate);
@@ -40,49 +42,49 @@ const gameArea = {
     /**
      * Clears the game area
      */
-    clear: () => {
-        gameArea.context.clearRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);
+    clear: function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
     /**
      * Draws a soldier on the canvas. If soldier has no related team image, draw him as a red/blue circle based on the team
      * @param {object} soldier The soldier to draw
      */
-    drawSoldier: (soldier) => {
-        const context = gameArea.context;
+    drawSoldier: function(soldier) {
+        // const context = gameArea.context;
         if (soldier.troopImg) {
-            if (!gameArea.imageCache[soldier.troopImg]) {
-                gameArea.loadImage(soldier.troopImg);
+            if (!this.imageCache[soldier.troopImg]) {
+                this.loadImage(soldier.troopImg);
             }
-            const img = gameArea.imageCache[soldier.troopImg];
+            const img = this.imageCache[soldier.troopImg];
             if (img) {
-                context.drawImage(img, soldier.x - 20, soldier.y - 20, 40, 40);
+                this.context.drawImage(img, soldier.x - 20, soldier.y - 20, 40, 40);
             }
         } else {
-            context.beginPath();
-            context.arc(soldier.x, soldier.y, 20, 0, 2 * Math.PI);
-            context.fillStyle = soldier.color;
-            context.fill();
+            this.context.beginPath();
+            this.context.arc(soldier.x, soldier.y, 20, 0, 2 * Math.PI);
+            this.context.fillStyle = soldier.color;
+            this.context.fill();
         }
     },
-    drawDeath: (deathEffect) => {
-        const context = gameArea.context;
-        context.beginPath();
-        context.arc(deathEffect.x, deathEffect.y, deathEffect.radius, 0, 2 * Math.PI);
-        context.fillStyle = 'red';
-        context.fill();
+    drawDeath: function(deathEffect) {
+        // const context = gameArea.context;
+        this.context.beginPath();
+        this.context.arc(deathEffect.x, deathEffect.y, deathEffect.radius, 0, 2 * Math.PI);
+        this.context.fillStyle = 'red';
+        this.context.fill();
     },
     /**
      * Loads a image from the inputted URL and saves it on the cache for future use
      * @param {string} imageUrl URL of the image 
      */
-    loadImage: (imageUrl) => {
-        if (gameArea.imageCache[imageUrl]) {
+    loadImage: function(imageUrl) {
+        if (this.imageCache[imageUrl]) {
             return;
         }
 
         let img = new Image();
         img.onload = () => {
-            gameArea.imageCache[imageUrl] = img;
+            this.imageCache[imageUrl] = img;
         };
         img.src = imageUrl;
     }
@@ -155,5 +157,3 @@ const handleAutoToggle = () => {
     gameArea.isAuto = !gameArea.isAuto
     gameArea.isAuto ? $('#auto-status').html('Auto mode: ON') : $('#auto-status').html('Auto mode: OFF')
 }
-
-const startGame = () => gameArea.start();

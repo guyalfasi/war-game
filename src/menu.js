@@ -2,10 +2,14 @@
  * Handle the team change name form
  * @param {string} team The team to handle the input 
  */
-const handleTeamFormSubmit = (team) => {
+const handleTeamNameSubmit = (team) => {
     const teamInput = document.getElementById(`${team === 'teamA' ? 'team-a' : 'team-b'}-name`);
     if (teamInput.value === '') {
-        alert('This field cannot be empty.');
+        alert('Team name is empty');
+        return;
+    }
+    if (teamInput.value.length >= 12) {
+        alert('Team name longer than 12 letters')
         return;
     }
     gameArea[team].teamName = teamInput.value;
@@ -16,14 +20,14 @@ const handleTeamFormSubmit = (team) => {
     teamInput.value = ''
 }
 
-document.getElementById("team-a-form").addEventListener("submit", (event) => { // add listeners for team name submit events
+document.getElementById("team-a-form").addEventListener("submit", (event) => { // listeners for team name submit events
     event.preventDefault();
-    handleTeamFormSubmit("teamA");
+    handleTeamNameSubmit("teamA");
 });
 
 document.getElementById("team-b-form").addEventListener("submit", (event) => {
     event.preventDefault();
-    handleTeamFormSubmit("teamB");
+    handleTeamNameSubmit("teamB");
 });
 
 /**

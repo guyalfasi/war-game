@@ -8,8 +8,7 @@ const startWar = async () => {
     if (!gameArea.teamA.troops.length && !gameArea.teamB.troops.length) {
         alert('Unable to start war; both teams are empty');
         return;
-    }
-    if (!gameArea.teamA.troops.length || !gameArea.teamB.troops.length) {
+    } else if (!gameArea.teamA.troops.length || !gameArea.teamB.troops.length) {
         alert('Unable to start war; one team is empty');
         return;
     }
@@ -36,16 +35,17 @@ const startWar = async () => {
 /**
  * Starts a delay of a few miliseconds
  * @param {Number} ms: The miliseconds to wait (multiply seconds by 1000 to get miliseconds)
+ * @returns {Promise} A promise that resolves after the timeout is over 
  */
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
  * Simulates a automatic fight between two inputted fighters. Returns one of the soldiers randomly
- * @param {object} soldier1
- * @param {object} soldier2
- * @returns A random soldier
+ * @param {object} fighterA
+ * @param {object} fighterB
+ * @returns A random fighter (whoever wins)
  */
-const fight = (soldier1, soldier2) => Math.random() > 0.5 ? soldier1 : soldier2;
+const fight = (fighterA, fighterB) => Math.random() > 0.5 ? fighterA : fighterB;
 
 /**
  * Simulates a non automatic fight between two inputted fighters, handles inputs, and returns the result of the fight.
@@ -88,6 +88,8 @@ const handleDuel = (fighterA, fighterB, drawTime) => {
                         document.removeEventListener('keydown', handleKeyPress);
                         resolve({ result: "winner", winner: fighterB });
                         break;
+                    default:
+                        break;
                 }
             }
         };
@@ -112,16 +114,15 @@ const warLoop = async () => {
         fighterAPos = { x: fighterA.x, y: fighterA.y }
         fighterBPos = { x: fighterB.x, y: fighterB.y }
 
-        await Promise.all([moveTo(fighterA, 200, 150, 2), moveTo(fighterB, 280, 150, 2)])
+        await Promise.all([moveTo(fighterA, 200, 150), moveTo(fighterB, 280, 150)])
 
         $("#status-text").html(`${fighterA.name} vs ${fighterB.name}`)
-        let winner;
+        
         await delay(1000);
-
+        let winner;
         while (!winner) {
             if (gameArea.isAuto) {
                 winner = fight(fighterA, fighterB);
-                $("#status-text").html(`${winner.name} won`);
             } else {
                 $("#status-text").html(`Wait... Team ${gameArea.teamA.teamName}: Press A, Team ${gameArea.teamB.teamName}: Press L`);
 
@@ -139,26 +140,22 @@ const warLoop = async () => {
                         continue;
                     case 'winner':
                         winner = duelResult.winner;
-                        $("#status-text").html(`${winner.name} won`);
                         break;
                 }
             }
         }
+        $("#status-text").html(`${winner.name} won`);
 
-        switch (winner) {
-            case fighterA:
-                gameArea.deathEffects.push({ x: fighterB.x, y: fighterB.y, radius: 8 });
-                gameArea.teamB.troops = gameArea.teamB.troops.filter(soldier => soldier !== fighterB);
-                await delay(1000);
-                await moveTo(fighterA, fighterAPos.x, fighterAPos.y, 2)
-                break;
-            case fighterB:
-                gameArea.deathEffects.push({ x: fighterA.x, y: fighterA.y, radius: 8 });
-                gameArea.teamA.troops = gameArea.teamA.troops.filter(soldier => soldier !== fighterA);
-                await delay(1000);
-                await moveTo(fighterB, fighterBPos.x, fighterBPos.y, 2)
-                break;
+        const handleCombatOutcome = async (winner, loser, winnerOriginalPosition) => {
+            gameArea.deathEffects.push({ x: loser.x, y: loser.y, radius: 8 });
+            const loserTeam = loser === fighterA ? gameArea.teamA : gameArea.teamB;
+            loserTeam.troops = loserTeam.troops.filter(soldier => soldier !== loser);
+            await delay(1000);
+            await moveTo(winner, winnerOriginalPosition.x, winnerOriginalPosition.y);
         }
+
+        winner === fighterA ? await handleCombatOutcome(winner, fighterB, fighterAPos) : await handleCombatOutcome(winner, fighterA, fighterBPos);
+
     } while (gameArea.teamA.troops.length && gameArea.teamB.troops.length);
     return gameArea.teamA.troops.length ? gameArea.teamA.teamName : gameArea.teamB.teamName;
 }
