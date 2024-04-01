@@ -1,3 +1,16 @@
+/**
+ * Represents the main game area and its properties, including the canvas element, team information, and image cache.
+ * It provides methods to start the game loop, clear the canvas, draw soldiers and death effects, and load images into the cache.
+ * 
+ * @property {HTMLCanvasElement} canvas - The canvas element
+ * @property {Object} teamA - Team A and its troops and team image 
+ * @property {Object} teamB - Same as above except for team B
+ * @property {Array} deathEffects - An array to store death effects to be drawn on the canvas
+ * @property {Object} imageCache - A cache to store loaded team images
+ * @property {number} verticalPosA - The vertical starting position for team A
+ * @property {number} verticalPosB  - The vertical starting position for team B
+ * @property {boolean} isAuto - Flag if the game is currently automatic or not
+ */
 const gameArea = {
     canvas: document.getElementById("canvas"),
     teamA: { teamName: 'A', troops: [], teamImg: '' },
@@ -7,6 +20,9 @@ const gameArea = {
     verticalPosA: 50,
     verticalPosB: 50,
     isAuto: false,
+    /**
+     * Initializes the game area and sets up the animation frame loop
+     */
     start: () => {
         gameArea.context = gameArea.canvas.getContext("2d");
         gameArea.lastFrameTime = Date.now();
@@ -21,9 +37,16 @@ const gameArea = {
         };
         requestAnimationFrame(animate);
     },
+    /**
+     * Clears the game area
+     */
     clear: () => {
         gameArea.context.clearRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);
     },
+    /**
+     * Draws a soldier on the canvas. If soldier has no related team image, draw him as a red/blue circle based on the team
+     * @param {object} soldier The soldier to draw
+     */
     drawSoldier: (soldier) => {
         const context = gameArea.context;
         if (soldier.troopImg) {
@@ -45,14 +68,18 @@ const gameArea = {
         const context = gameArea.context;
         context.beginPath();
         context.arc(deathEffect.x, deathEffect.y, deathEffect.radius, 0, 2 * Math.PI);
-        context.fillStyle = 'red'; // its blood btw
+        context.fillStyle = 'red';
         context.fill();
     },
+    /**
+     * Loads a image from the inputted URL and saves it on the cache for future use
+     * @param {string} imageUrl URL of the image 
+     */
     loadImage: (imageUrl) => {
         if (gameArea.imageCache[imageUrl]) {
             return;
         }
-        
+
         let img = new Image();
         img.onload = () => {
             gameArea.imageCache[imageUrl] = img;
@@ -61,6 +88,9 @@ const gameArea = {
     }
 };
 
+/**
+ * Updates the game canvas area for each object and effect displayed inside
+ */
 const updateGameArea = () => {
     gameArea.clear();
     gameArea.teamA.troops.forEach(soldier => gameArea.drawSoldier(soldier));
@@ -74,7 +104,10 @@ const updateGameArea = () => {
     });
 };
 
-
+/**
+ * Creates a new soldier object and adds him to a team defined in the parameter
+ * @param {string} team The team to add the soldier on
+ */
 const addSoldier = (team) => {
     if ((team === 'a' && gameArea.teamA.troops.length >= 5) || (team === 'b' && gameArea.teamB.troops.length >= 5)) {
         alert(`Max number of team members on team ${team} reached`);
@@ -92,6 +125,10 @@ const addSoldier = (team) => {
     }
 };
 
+/**
+ * Removes a soldier from a team defined in the parameter
+ * @param {string} team 
+ */
 const removeSoldier = (team) => {
     if ((team === 'a' && !gameArea.teamA.troops.length) || (team === 'b' && !gameArea.teamB.troops.length)) {
         alert(`Cannot remove from team ${team}, it has no soldiers`);
@@ -111,6 +148,9 @@ const removeSoldier = (team) => {
     }
 }
 
+/**
+ * Toggles automatic mode on the game
+ */
 const handleAutoToggle = () => {
     gameArea.isAuto = !gameArea.isAuto
     gameArea.isAuto ? $('#auto-status').html('Auto mode: ON') : $('#auto-status').html('Auto mode: OFF')

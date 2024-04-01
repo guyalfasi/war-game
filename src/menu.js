@@ -1,3 +1,7 @@
+/**
+ * Handle the team change name form
+ * @param {string} team The team to handle the input 
+ */
 const handleTeamFormSubmit = (team) => {
     const teamInput = document.getElementById(`${team === 'teamA' ? 'team-a' : 'team-b'}-name`);
     if (teamInput.value === '') {
@@ -12,7 +16,7 @@ const handleTeamFormSubmit = (team) => {
     teamInput.value = ''
 }
 
-document.getElementById("team-a-form").addEventListener("submit", (event) => {
+document.getElementById("team-a-form").addEventListener("submit", (event) => { // add listeners for team name submit events
     event.preventDefault();
     handleTeamFormSubmit("teamA");
 });
@@ -22,6 +26,12 @@ document.getElementById("team-b-form").addEventListener("submit", (event) => {
     handleTeamFormSubmit("teamB");
 });
 
+/**
+ * Sets the team image for a team
+ * @param {event} event The image input change event
+ * @param {string} team The team to set the image on 
+ * @returns 
+ */
 const setTeamImage = (event, team) => {
     let reader = new FileReader();
     reader.onload = () => {
@@ -37,6 +47,9 @@ const setTeamImage = (event, team) => {
     reader.readAsDataURL(event.target.files[0]);
 };
 
+/**
+ * Resets the game and the teams entirely
+ */
 const resetGame = () => {
     gameArea.teamA.troops = [];
     gameArea.teamB.troops = [];
@@ -49,12 +62,20 @@ const resetGame = () => {
     document.getElementById('img-input-team-b').value = ''
 }
 
+/**
+ * Clears the team image for a defined team
+ * @param {string} team The team to clear the image
+ */
 const clearImage = (team) => {
     document.getElementById(`img-input-team-${team}`).value = ''
     gameArea[`team${team.toUpperCase()}`].teamImg = ''
     gameArea[`team${team.toUpperCase()}`].troops.forEach((soldier) => soldier.troopImg = '')
 }
 
+/**
+ * Toggle the menu buttons
+ * @param {boolean} bool Disable/enable menu buttons 
+ */
 const toggleMenuButtons = (bool) => {
     $(".menu-button-group button").prop('disabled', bool);
     $(".team-sections button").prop('disabled', bool);

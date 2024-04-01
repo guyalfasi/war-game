@@ -1,3 +1,9 @@
+/**
+ * Starts a war when called. Checks if both teams are valid (have any members in them),
+ * saves the teams so nothing gets erased during the war, disables buttons and starts the war.
+ * When the function warLoop returns a team winner, it displays the winner, loads the teams pre-war
+ * and reenables button use.
+ */
 const startWar = async () => {
     if (!gameArea.teamA.troops.length && !gameArea.teamB.troops.length) {
         alert('Unable to start war; both teams are empty');
@@ -27,10 +33,28 @@ const startWar = async () => {
     toggleMenuButtons(false);
 }
 
+/**
+ * Starts a delay of a few miliseconds
+ * @param {Number} ms: The miliseconds to wait (multiply seconds by 1000 to get miliseconds)
+ */
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
+/**
+ * Simulates a automatic fight between two inputted fighters. Returns one of the soldiers randomly
+ * @param {object} soldier1
+ * @param {object} soldier2
+ * @returns A random soldier
+ */
 const fight = (soldier1, soldier2) => Math.random() > 0.5 ? soldier1 : soldier2;
 
+/**
+ * Simulates a non automatic fight between two inputted fighters, handles inputs, and returns the result of the fight.
+ * The function has handlers for no input pressed, early input and winner handling.
+ * @param {object} fighterA The first fighter
+ * @param {object} fighterB The second fighter
+ * @param {Number} drawTime How long to wait until draw
+ * @returns A promise that contains a object representing the result for future handling
+ */
 const handleDuel = (fighterA, fighterB, drawTime) => {
     return new Promise(resolve => {
         let validPress = false;
@@ -71,6 +95,13 @@ const handleDuel = (fighterA, fighterB, drawTime) => {
     })
 };
 
+/**
+ * The main game loop. Chooses a random fighter from the two teams, move them to the center and fight until one team is empty
+ * If the game is on automatic mode, the fights are handled automatically
+ * If the game is not on automatic mode, the fights are handled using the handleDuel function
+ * When a fight winner is receieved remove the loser from his team and play a death effect
+ * @returns {string} The winning team name
+ */
 const warLoop = async () => {
     do {
         let fighterA = gameArea.teamA.troops[Math.floor(Math.random() * gameArea.teamA.troops.length)];
@@ -132,7 +163,15 @@ const warLoop = async () => {
     return gameArea.teamA.troops.length ? gameArea.teamA.teamName : gameArea.teamB.teamName;
 }
 
-const moveTo = (soldier, targetX, targetY, speed) => new Promise(resolve => {
+/**
+ * Moves a soldier object towards a specified location on the game area.
+ * @param {Object} soldier - The soldier object
+ * @param {number} targetX - The x-coordinate
+ * @param {number} targetY - The y-coordinate
+ * @returns {Promise} A promise that resolves once the soldier has reached the target location
+ */
+const moveTo = (soldier, targetX, targetY) => new Promise(resolve => {
+    const speed = 2;
     const animateMove = () => {
         let dx = targetX - soldier.x;
         let dy = targetY - soldier.y;
