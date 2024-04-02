@@ -57,8 +57,7 @@ const fight = (fighterA, fighterB) => Math.random() > 0.5 ? fighterA : fighterB;
  */
 const handleDuel = (fighterA, fighterB, drawTime) => {
     return new Promise(resolve => {
-        let validPress = false;
-
+        let validPress = false;        
         const inputTimeout = setTimeout(() => {
             document.removeEventListener('keydown', handleKeyPress);
             resolve({ result: "noInput" })
@@ -74,7 +73,7 @@ const handleDuel = (fighterA, fighterB, drawTime) => {
                 clearTimeout(inputTimeout);
                 clearTimeout(drawTimeout);
                 document.removeEventListener('keydown', handleKeyPress);
-                resolve({ result: "earlyPress" })
+                resolve({ result: "earlyPress", earlyPresser: event.key.toUpperCase() === 'A' ? gameArea.teamA.teamName : gameArea.teamB.teamName })
             }
             if (validPress) {
                 switch (event.key.toUpperCase()) {
@@ -120,6 +119,8 @@ const warLoop = async () => {
         
         await delay(1000);
         let winner;
+        let teamAStrikes = 0;
+        let teamBStrikes = 0;
         while (!winner) {
             if (gameArea.isAuto) {
                 winner = fight(fighterA, fighterB);
@@ -135,8 +136,15 @@ const warLoop = async () => {
                         await delay(2000);
                         continue;
                     case 'earlyPress':
-                        $("#status-text").html(`Pressed too early, restarting duel`);
-                        await delay(2000);
+                        duelResult.earlyPresser === gameArea.teamA.teamName ? teamAStrikes++ : teamBStrikes++;
+                        if (teamAStrikes === 3 || teamBStrikes === 3) {
+                            $("#status-text").html(`Strike 3, team ${duelResult.earlyPresser} is out!`);
+                            winner = teamAStrikes !== 3 ? fighterA : fighterB
+                        } else {
+                            let currentPressCount = duelResult.earlyPresser === gameArea.teamA.teamName ? teamAStrikes : teamBStrikes;
+                            $("#status-text").html(`Team ${duelResult.earlyPresser} pressed too early, they have ${currentPressCount} strikes now`);
+                        }
+                        await delay(1000);
                         continue;
                     case 'winner':
                         winner = duelResult.winner;

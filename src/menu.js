@@ -34,7 +34,6 @@ document.getElementById("team-b-form").addEventListener("submit", (event) => {
  * Sets the team image for a team
  * @param {event} event The image input change event
  * @param {string} team The team to set the image on 
- * @returns 
  */
 const setTeamImage = (event, team) => {
     let reader = new FileReader();

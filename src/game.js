@@ -26,7 +26,6 @@ const gameArea = {
      * Initializes the game area and sets up the animation frame loop
      */
     start: function() {
-        // this.context = this.canvas.getContext("2d");
         this.lastFrameTime = Date.now();
         const animate = () => {
             const now = Date.now();
@@ -50,7 +49,6 @@ const gameArea = {
      * @param {object} soldier The soldier to draw
      */
     drawSoldier: function(soldier) {
-        // const context = gameArea.context;
         if (soldier.troopImg) {
             if (!this.imageCache[soldier.troopImg]) {
                 this.loadImage(soldier.troopImg);
@@ -67,7 +65,6 @@ const gameArea = {
         }
     },
     drawDeath: function(deathEffect) {
-        // const context = gameArea.context;
         this.context.beginPath();
         this.context.arc(deathEffect.x, deathEffect.y, deathEffect.radius, 0, 2 * Math.PI);
         this.context.fillStyle = 'red';
