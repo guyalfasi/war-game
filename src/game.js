@@ -23,20 +23,10 @@ const gameArea = {
     isAuto: false,
     
     /**
-     * Initializes the game area and sets up the animation frame loop
+     * Initializes the game area and sets up the animation update interval
      */
     start: function() {
-        this.lastFrameTime = Date.now();
-        const animate = () => {
-            const now = Date.now();
-            const elapsed = now - this.lastFrameTime;
-            if (elapsed > 20) { // simulate interval of 20ms
-                this.lastFrameTime = now - (elapsed % 20);
-                updateGameArea();
-            }
-            requestAnimationFrame(animate);
-        };
-        requestAnimationFrame(animate);
+        this.interval = setInterval(updateGameArea, 20);
     },
     /**
      * Clears the game area
@@ -51,11 +41,11 @@ const gameArea = {
     drawSoldier: function(soldier) {
         if (soldier.troopImg) {
             if (!this.imageCache[soldier.troopImg]) {
-                this.loadImage(soldier.troopImg);
+                this.loadImage(soldier.troopImg); // saves new image into the cache
             }
-            const img = this.imageCache[soldier.troopImg];
+            const img = this.imageCache[soldier.troopImg]; 
             if (img) {
-                this.context.drawImage(img, soldier.x - 20, soldier.y - 20, 40, 40);
+                this.context.drawImage(img, soldier.x - 20, soldier.y - 20, 40, 40); // creates image instead of the red/blue circle if found in cache
             }
         } else {
             this.context.beginPath();
@@ -75,13 +65,13 @@ const gameArea = {
      * @param {string} imageUrl URL of the image 
      */
     loadImage: function(imageUrl) {
-        if (this.imageCache[imageUrl]) {
+        if (this.imageCache[imageUrl]) { // if the image already exists within the cache then theres no need to save it
             return;
         }
 
         let img = new Image();
         img.onload = () => {
-            this.imageCache[imageUrl] = img;
+            this.imageCache[imageUrl] = img; // saves the image into the cache
         };
         img.src = imageUrl;
     }

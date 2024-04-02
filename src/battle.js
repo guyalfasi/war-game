@@ -13,7 +13,7 @@ const startWar = async () => {
         return;
     }
 
-    const savedTeams = {
+    const savedTeams = { // save the pre battle state of the teams
         teamA: JSON.parse(JSON.stringify(gameArea.teamA.troops)),
         teamB: JSON.parse(JSON.stringify(gameArea.teamB.troops))
     };
@@ -58,18 +58,18 @@ const fight = (fighterA, fighterB) => Math.random() > 0.5 ? fighterA : fighterB;
 const handleDuel = (fighterA, fighterB, drawTime) => {
     return new Promise(resolve => {
         let validPress = false;        
-        const inputTimeout = setTimeout(() => {
+        const inputTimeout = setTimeout(() => { // timeout to handle late inputs
             document.removeEventListener('keydown', handleKeyPress);
             resolve({ result: "noInput" })
         }, 2000 + drawTime);
 
-        const drawTimeout = setTimeout(() => {
+        const drawTimeout = setTimeout(() => { // timeout to handle draw time, makes input valids
             validPress = true;
             $("#status-text").html("Draw!");
         }, drawTime);
 
         const handleKeyPress = (event) => {
-            if (!validPress && (event.key.toUpperCase() === 'A' || event.key.toUpperCase() === 'L')) {
+            if (!validPress && (event.key.toUpperCase() === 'A' || event.key.toUpperCase() === 'L')) { // handle all invalid/early presses
                 clearTimeout(inputTimeout);
                 clearTimeout(drawTimeout);
                 document.removeEventListener('keydown', handleKeyPress);

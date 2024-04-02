@@ -13,7 +13,7 @@ const handleTeamNameSubmit = (team) => {
         return;
     }
     gameArea[team].teamName = teamInput.value;
-    gameArea[team].troops.forEach((s, index) => {
+    gameArea[team].troops.forEach((s, index) => { // change the name for every troop inside the team
         s.name = `${teamInput.value}${index + 1}`
     })
     alert(`${team === 'teamA' ? 'Team A' : 'Team B'}'s name set to ${teamInput.value}`)
@@ -36,8 +36,8 @@ document.getElementById("team-b-form").addEventListener("submit", (event) => {
  * @param {string} team The team to set the image on 
  */
 const setTeamImage = (event, team) => {
-    let reader = new FileReader();
-    reader.onload = () => {
+    let reader = new FileReader(); 
+    reader.onload = () => { // when reader loads image set the team image as the loaded image
         gameArea[`team${team.toUpperCase()}`].teamImg = reader.result;
         gameArea[`team${team.toUpperCase()}`].troops.forEach(s => s.troopImg = reader.result);
     };
@@ -47,7 +47,7 @@ const setTeamImage = (event, team) => {
         return;
     }
 
-    reader.readAsDataURL(event.target.files[0]);
+    reader.readAsDataURL(event.target.files[0]); // read the data url to add to the team image
 };
 
 /**
