@@ -28,7 +28,7 @@ const startWar = async () => {
 
     gameArea.teamA.troops = savedTeams.teamA;
     gameArea.teamB.troops = savedTeams.teamB;
-    $("#status-text").html("")
+    $("#status-text").html("Waiting for war start")
     toggleMenuButtons(false);
 }
 
