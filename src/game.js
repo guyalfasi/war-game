@@ -23,13 +23,14 @@ const gameArea = {
     isAuto: false,
     
     /**
-     * Initializes the game area and sets up the animation update interval
+     * Initializes the game section (canvas and status) and sets up the animation update interval
      */
     start: function() {
         this.interval = setInterval(updateGameArea, 20);
+        this.statusText = $('#status-text')
     },
     /**
-     * Clears the game area
+     * Clears the game area for refresh
      */
     clear: function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -104,12 +105,14 @@ const addSoldier = (team) => {
     };
     switch (team) {
         case 'a':
-            gameArea.teamA.troops.push({ name: `${gameArea.teamA.teamName}${gameArea.teamA.troops.length + 1}`, color: 'blue', x: 40, y: gameArea.verticalPosA, troopImg: gameArea.teamA.teamImg });
+            gameArea.teamA.troops = [...gameArea.teamA.troops, { name: `${gameArea.teamA.teamName}${gameArea.teamA.troops.length + 1}`, color: 'blue', x: 40, y: gameArea.verticalPosA, troopImg: gameArea.teamA.teamImg }]
             gameArea.verticalPosA += 50;
             break;
         case 'b':
-            gameArea.teamB.troops.push({ name: `${gameArea.teamB.teamName}${gameArea.teamB.troops.length + 1}`, color: 'red', x: 440, y: gameArea.verticalPosB, troopImg: gameArea.teamB.teamImg });
+            gameArea.teamB.troops = [...gameArea.teamB.troops, { name: `${gameArea.teamB.teamName}${gameArea.teamB.troops.length + 1}`, color: 'red', x: 440, y: gameArea.verticalPosB, troopImg: gameArea.teamB.teamImg }]
             gameArea.verticalPosB += 50;
+            break;
+        default:
             break;
     }
 };
@@ -142,5 +145,5 @@ const removeSoldier = (team) => {
  */
 const handleAutoToggle = () => {
     gameArea.isAuto = !gameArea.isAuto
-    gameArea.isAuto ? $('#auto-status').html('Auto mode: ON') : $('#auto-status').html('Auto mode: OFF')
+    gameArea.isAuto ? $('#auto-status').text('Auto mode: ON') : $('#auto-status').text('Auto mode: OFF')
 }

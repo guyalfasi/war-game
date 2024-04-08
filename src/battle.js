@@ -19,16 +19,16 @@ const startWar = async () => {
     };
 
     toggleMenuButtons(true);
-    $("#status-text").html(`Team ${gameArea.teamA.teamName} vs Team ${gameArea.teamB.teamName}`)
+    gameArea.statusText.text(`Team ${gameArea.teamA.teamName} vs Team ${gameArea.teamB.teamName}`)
     await delay(2000);
 
     let teamWinner = await warLoop();
-    $("#status-text").html(`Team ${teamWinner} won`)
+    gameArea.statusText.text(`Team ${teamWinner} won`)
     await delay(3000);
 
     gameArea.teamA.troops = savedTeams.teamA;
     gameArea.teamB.troops = savedTeams.teamB;
-    $("#status-text").html("Waiting for war start")
+    gameArea.statusText.text("Waiting for war start")
     toggleMenuButtons(false);
 }
 
@@ -63,9 +63,9 @@ const handleDuel = (fighterA, fighterB, drawTime) => {
             resolve({ result: "noInput" })
         }, 2000 + drawTime);
 
-        const drawTimeout = setTimeout(() => { // timeout to handle draw time, makes input valids
+        const drawTimeout = setTimeout(() => { // timeout to handle draw time, makes input valid
             validPress = true;
-            $("#status-text").html("Draw!");
+            gameArea.statusText.text("Draw!");
         }, drawTime);
 
         const handleKeyPress = (event) => {
@@ -115,8 +115,8 @@ const warLoop = async () => {
 
         await Promise.all([moveTo(fighterA, 200, 150), moveTo(fighterB, 280, 150)])
 
-        $("#status-text").html(`${fighterA.name} vs ${fighterB.name}`)
-        
+        gameArea.statusText.text(`${fighterA.name} vs ${fighterB.name}`)
+
         await delay(1000);
         let winner;
         let teamAStrikes = 0;
@@ -125,24 +125,24 @@ const warLoop = async () => {
             if (gameArea.isAuto) {
                 winner = fight(fighterA, fighterB);
             } else {
-                $("#status-text").html(`Wait... Team ${gameArea.teamA.teamName}: Press A, Team ${gameArea.teamB.teamName}: Press L`);
+                gameArea.statusText.text(`Wait... Team ${gameArea.teamA.teamName}: Press A, Team ${gameArea.teamB.teamName}: Press L`);
 
-                let drawTime = Math.floor((Math.random() * 10 * 1000) + 2000);
+                let drawTime = Math.floor((Math.random() * 8 * 1000) + 2000);
                 duelResult = await handleDuel(fighterA, fighterB, drawTime);
 
                 switch (duelResult.result) {
                     case 'noInput':
-                        $("#status-text").html("No one pressed A/L, restarting duel");
+                        gameArea.statusText.text("No one pressed A/L, restarting duel");
                         await delay(2000);
                         continue;
                     case 'earlyPress':
                         duelResult.earlyPresser === gameArea.teamA.teamName ? teamAStrikes++ : teamBStrikes++;
                         if (teamAStrikes === 3 || teamBStrikes === 3) {
-                            $("#status-text").html(`Strike 3, team ${duelResult.earlyPresser} is out!`);
+                            gameArea.statusText.text(`Strike 3, team ${duelResult.earlyPresser} is out!`);
                             winner = teamAStrikes !== 3 ? fighterA : fighterB
                         } else {
                             let currentPressCount = duelResult.earlyPresser === gameArea.teamA.teamName ? teamAStrikes : teamBStrikes;
-                            $("#status-text").html(`Team ${duelResult.earlyPresser} pressed too early, they have ${currentPressCount} strikes now`);
+                            gameArea.statusText.text(`Team ${duelResult.earlyPresser} pressed too early, they have ${currentPressCount} strikes now`);
                         }
                         await delay(1000);
                         continue;
@@ -152,7 +152,7 @@ const warLoop = async () => {
                 }
             }
         }
-        $("#status-text").html(`${winner.name} won`);
+        gameArea.statusText.text(`${winner.name} won`);
 
         const handleCombatOutcome = async (winner, loser, winnerOriginalPosition) => {
             gameArea.deathEffects.push({ x: loser.x, y: loser.y, radius: 8 });

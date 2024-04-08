@@ -8,8 +8,8 @@ const handleTeamNameSubmit = (team) => {
         alert('Team name is empty');
         return;
     }
-    if (teamInput.value.length >= 12) {
-        alert('Team name longer than 12 letters')
+    if (teamInput.value.length >= 24) {
+        alert('Team name longer than 24 letters')
         return;
     }
     gameArea[team].teamName = teamInput.value;
